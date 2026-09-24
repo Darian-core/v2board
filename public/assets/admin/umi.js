@@ -5790,7 +5790,19 @@
                     placeholder: "\xa5",
                     defaultValue: t.currency_symbol,
                     onChange: e=>this.set("site", "currency_symbol", e.target.value)
-                })))), f.a.createElement(s["a"].TabPane, {
+                })), f.a.createElement(m, {
+                    title: "\u7b7e\u5230\u529f\u80fd",
+                    description: "\u5f00\u542f\u540e\u7528\u6237\u53ef\u4ee5\u901a\u8fc7\u6bcf\u65e5\u7b7e\u5230\u83b7\u5f97\u968f\u673a\u6d41\u91cf\u5956\u52b1\u3002"
+                }, f.a.createElement(l["a"], {
+                    checked: parseInt(t.checkin_enable),
+                    onChange: e=>this.set("site", "checkin_enable", e ? 1 : 0)
+                })), parseInt(t.checkin_enable) ? f.a.createElement(m, {
+                    title: "\u8fd0\u6c14\u7b7e\u5230",
+                    description: "\u5f00\u542f\u540e\u7528\u6237\u53ef\u4ee5\u4f7f\u7528\u8fd0\u6c14\u7b7e\u5230\uff0c\u53ef\u80fd\u83b7\u5f97\u6216\u6263\u9664\u6d41\u91cf\uff08-100%~+100%\uff09\u3002"
+                }, f.a.createElement(l["a"], {
+                    checked: parseInt(t.lucky_checkin_enable),
+                    onChange: e=>this.set("site", "lucky_checkin_enable", e ? 1 : 0)
+                })) : null)), f.a.createElement(s["a"].TabPane, {
                     tab: "\u5b89\u5168",
                     key: "safe"
                 }, f.a.createElement("div", {
@@ -16783,6 +16795,13 @@
             },
             e
         }
+        // Config saves rewrite one shared file, so serialize requests across tabs.
+        var configSaveQueue = Promise.resolve();
+        function saveConfigRequest(values) {
+            var request = configSaveQueue.then(()=>Object(c["b"])("/" + window.settings.secure_path + "/config/save", values));
+            configSaveQueue = request.catch(()=>{});
+            return request;
+        }
         var h = {
             ticket: {},
             deposit: {},
@@ -16878,7 +16897,7 @@
                                 case 2:
                                     return t = e.sent,
                                     e.next = 5,
-                                    Object(c["b"])("/" + window.settings.secure_path + "/config/save", a()({}, t[n]));
+                                    saveConfigRequest(a()({}, t[n]));
                                 case 5:
                                     if (s = e.sent,
                                     200 === s.code) {

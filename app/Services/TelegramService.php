@@ -84,6 +84,8 @@ class TelegramService {
                     $command = $commandProp->isStatic()
                         ? $commandProp->getValue()
                         : $ref->newInstanceWithoutConstructor()->command;
+                    // 路由匹配保留 / 前缀，BotCommand 菜单注册使用不带 / 的名称。
+                    $command = ltrim($command, '/');
 
                     $description = $descProp->isStatic()
                         ? $descProp->getValue()

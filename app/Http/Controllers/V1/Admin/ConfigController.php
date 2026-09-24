@@ -104,6 +104,8 @@ class ConfigController extends Controller
                 'tos_url' => config('v2board.tos_url'),
                 'currency' => config('v2board.currency', 'CNY'),
                 'currency_symbol' => config('v2board.currency_symbol', '¥'),
+                'checkin_enable' => (int)config('v2board.checkin_enable', 0),
+                'lucky_checkin_enable' => (int)config('v2board.lucky_checkin_enable', 0),
             ],
             'subscribe' => [
                 'plan_change_enable' => (int)config('v2board.plan_change_enable', 1),
@@ -189,6 +191,10 @@ class ConfigController extends Controller
     public function save(ConfigSave $request)
     {
         $data = $request->validated();
+        // 与参考签到设置保持联动：关闭签到时也关闭运气签到。
+        if (isset($data['checkin_enable']) && !$data['checkin_enable']) {
+            $data['lucky_checkin_enable'] = 0;
+        }
         $config = config('v2board');
         foreach (ConfigSave::RULES as $k => $v) {
             if (!in_array($k, array_keys(ConfigSave::RULES))) {

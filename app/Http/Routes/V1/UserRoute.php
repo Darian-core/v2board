@@ -12,6 +12,8 @@ class UserRoute
             'middleware' => 'user'
         ], function ($router) {
             // User
+            $router->get ('/checkin/status', 'V1\\User\\CheckinController@status');
+            $router->post('/checkin', 'V1\\User\\CheckinController@claim');
             $router->get ('/unbindTelegram', 'V1\\User\\UserController@unbindTelegram');
             $router->get ('/resetSecurity', 'V1\\User\\UserController@resetSecurity');
             $router->get ('/info', 'V1\\User\\UserController@info');

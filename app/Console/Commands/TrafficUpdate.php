@@ -52,23 +52,25 @@ class TrafficUpdate extends Command
             return;
         }
 
-        $users = User::whereIn('id', array_keys($downloads))->get(['id', 'u', 'd']);
+        $users = User::whereIn('id', array_unique(array_merge(array_keys($uploads), array_keys($downloads))))->get(['id']);
+        if ($users->isEmpty()) return;
         $time = time();
         $casesU = [];
         $casesD = [];
         $idList = [];
 
         foreach ($users as $user) {
-            $upload = $uploads[$user->id] ?? 0;
-            $download = $downloads[$user->id] ?? 0;
+            $upload = (int) ($uploads[$user->id] ?? 0);
+            $download = (int) ($downloads[$user->id] ?? 0);
 
-            $casesU[] = "WHEN {$user->id} THEN " . ($user->u + $upload);
-            $casesD[] = "WHEN {$user->id} THEN " . ($user->d + $download);
+            $casesU[] = "WHEN {$user->id} THEN u + {$upload}";
+            $casesD[] = "WHEN {$user->id} THEN d + {$download}";
             $idList[] = $user->id;
         }
         $idListStr = implode(',', $idList);
         $casesUStr = implode(' ', $casesU);
         $casesDStr = implode(' ', $casesD);
+        // 直接在数据库内累加，避免覆盖用户读取后并发签到产生的负 d。
         $sql = "UPDATE v2_user SET u = CASE id {$casesUStr} END, d = CASE id {$casesDStr} END, t = {$time}, updated_at = {$time} WHERE id IN ({$idListStr})";
         try {
             DB::beginTransaction();

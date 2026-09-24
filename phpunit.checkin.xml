@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<phpunit bootstrap="tests/checkin-bootstrap.php" colors="true" failOnWarning="true">
+    <testsuites>
+        <testsuite name="Isolated daily check-in">
+            <file>tests/Feature/CheckinTest.php</file>
+        </testsuite>
+    </testsuites>
+</phpunit>

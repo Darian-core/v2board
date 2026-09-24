@@ -194,7 +194,8 @@ class OrderService
         $paidTotalAmount = ($lastOneTimeOrder->total_amount + $lastOneTimeOrder->balance_amount);
         if ($paidTotalAmount == 0) return;
         $notUsedTraffic = $nowUserTraffic - (($user->u + $user->d) / 1073741824);
-        $remainingTrafficRatio = $notUsedTraffic / $nowUserTraffic;
+        // 签到预存流量可以超出套餐，但折抵比例最多为实际购买价值的 100%。
+        $remainingTrafficRatio = min(1, max(0, $notUsedTraffic / $nowUserTraffic));
         $result = $remainingTrafficRatio * $paidTotalAmount;
         $order->surplus_amount = max($result, 0);
         $orderModel = Order::where('user_id', $user->id)->where('period', '!=', 'reset_price')->where('status', 3);
@@ -234,7 +235,7 @@ class OrderService
         $usedTraffic = ($user->u + $user->d);
         if ($totalTraffic == 0) return;
     
-        $remainingTrafficRatio = ($totalTraffic - $usedTraffic) / $totalTraffic;
+        $remainingTrafficRatio = min(1, max(0, ($totalTraffic - $usedTraffic) / $totalTraffic));
     
         $avgPricePerSecond = $orderAmountSum / $orderRangeSecond;
         if ($orderRangeSecond <= 31 * 86400) {
@@ -250,7 +251,7 @@ class OrderService
                                   $avgPricePerSecond * $laterMonthsSeconds;
         }
     
-        $order->surplus_amount = max($orderSurplusAmount, 0);
+        $order->surplus_amount = min(max($orderAmountSum, 0), max($orderSurplusAmount, 0));
         $order->surplus_order_ids = array_column($orders, 'id');
     }
 

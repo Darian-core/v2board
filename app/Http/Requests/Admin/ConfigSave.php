@@ -42,6 +42,8 @@ class ConfigSave extends FormRequest
         'tos_url' => 'nullable|url',
         'currency' => '',
         'currency_symbol' => '',
+        'checkin_enable' => 'in:0,1',
+        'lucky_checkin_enable' => 'in:0,1',
         // subscribe
         'plan_change_enable' => 'in:0,1',
         'reset_traffic_method' => 'in:0,1,2,3,4',
